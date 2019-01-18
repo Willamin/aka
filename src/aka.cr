@@ -81,6 +81,10 @@ module Aka
     def each
       @aliases.each { |a| yield a }
     end
+
+    def size
+      @aliases.size
+    end
   end
 end
 
@@ -95,12 +99,18 @@ aliases = Aka::AliasList.from_yaml(content)
 
 # business logic
 if PROGRAM_NAME == "aka" || PROGRAM_NAME == "bin/aka"
-  if ARGV.includes?("--setup")
+  if ARGV.includes?("--link")
+    issues = 0
     aliases.each do |a|
       Process.executable_path.try do |path|
+        begin
         FileUtils.ln_s(path, File.expand_path("~/.config/aka/#{a.invocation}"))
+        rescue e
+          issues += 1
+        end
       end
     end
+    "linked #{aliases.size - issues} aliases".success!
   end
 
   if ARGV.includes?("--list")
