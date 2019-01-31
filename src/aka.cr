@@ -35,20 +35,33 @@ module Aka
     end
 
     def success!
+      longest_line = @call.lines.max_by(&.size)
+
       STDERR.puts ("┌────────┐")
 
       STDERR.print("│ alias: └")
-      STDERR.print("─" * (@call.size - 6))
+      STDERR.print("─" * (longest_line.size - 6))
       STDERR.print("─┐")
       STDERR.puts
 
-      STDERR.print("│ $ ")
-      STDERR.print(@call)
-      STDERR.print(" │")
-      STDERR.puts
+      @call.lines[0].tap do |call_line|
+        STDERR.print("│ $ ")
+        STDERR.print(call_line)
+        STDERR.print(" " * (longest_line.size - call_line.size))
+        STDERR.print(" │")
+        STDERR.puts
+      end
+
+      @call.lines[1..-1].each do |call_line|
+        STDERR.print("│   ")
+        STDERR.print(call_line)
+        STDERR.print(" " * (longest_line.size - call_line.size))
+        STDERR.print(" │")
+        STDERR.puts
+      end
 
       STDERR.print("└─")
-      STDERR.print("─" * (@call.size + 2))
+      STDERR.print("─" * (longest_line.size + 2))
       STDERR.print("─┘")
       STDERR.puts
       STDERR.puts
