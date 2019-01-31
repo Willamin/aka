@@ -12,6 +12,14 @@ Choose whichever method works for you:
 
 Either way, `aka` reads the configuration, looks at how it was invoked (busybox-style) and executes the appropriate alias. Additionally, `aka` will print out a formatted explanation of what the alias is for. Printing out the alias when running it both helps avoid forgetting the true command and helps others that watch you program to understand what's happening.
 
+## Installation
+
+Aka is written in [Crystal](https://crystal-lang.org). As such, it must be compiled before it can be ran. After installing the Crystal compiler, you should be able to do the following:
+  - `$ git clone git@github.com:Willamin/aka.git`
+  - `$ cd aka`
+  - `$ shards build --release`
+  - the binary will be built at `bin/aka`, which should then be linked or copied to someplace in your PATH
+
 ## Contributing
 
 1. Fork it ( https://github.com/Willamin/aka/fork )
