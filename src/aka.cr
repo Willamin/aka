@@ -66,7 +66,9 @@ module Aka
       STDERR.puts
       STDERR.puts
 
-      Process.exec("/bin/bash", ["-c", @call])
+      full_call = ([@call] + ARGV).join(" ")
+
+      Process.exec("/bin/bash", ["-c", full_call])
     end
   end
 
@@ -130,7 +132,7 @@ if PROGRAM_NAME == "aka" || PROGRAM_NAME == "bin/aka"
     aliases.success!
   end
 
-  input = ARGV[0]?
+  input = ARGV[0]?.tap( &.try { ARGV.replace(ARGV[1..-1]) })
 else
   input = File.basename(PROGRAM_NAME)
 end
