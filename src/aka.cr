@@ -66,7 +66,7 @@ module Aka
       STDERR.puts
       STDERR.puts
 
-      Process.exec(@call.split[0], @call.split[1..-1])
+      Process.exec("/bin/bash", ["-c", @call])
     end
   end
 
