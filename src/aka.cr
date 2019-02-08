@@ -67,8 +67,13 @@ module Aka
       STDERR.puts
 
       full_call = ([@call] + ARGV).join(" ")
+      bash_args = ["-c", full_call]
 
-      Process.exec("/bin/bash", ["-c", full_call])
+      if STDIN.tty?
+        bash_args = bash_args.unshift("-i")
+      end
+
+      Process.exec("/bin/bash", bash_args)
     end
   end
 
