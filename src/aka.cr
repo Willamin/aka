@@ -13,8 +13,18 @@ class Object
   end
 end
 
+class String
+  def to_bool
+    case self.downcase
+    when "true", "1", "yes" then true
+    else                         false
+    end
+  end
+end
+
 module Aka
-  VERSION = {{ `shards version #{__DIR__}`.chomp.stringify }}
+  VERSION             = {{ `shards version #{__DIR__}`.chomp.stringify }}
+  ALIAS_HIDE_REMINDER = ENV["AKA_HIDE_REMINDER"]?.try(&.to_bool) || false
 
   class Alias
     getter invocation : String
@@ -37,34 +47,34 @@ module Aka
     def success!
       longest_line = Math.max(@call.lines.max_by(&.size).size, 6)
 
-      STDERR.puts ("┌────────┐")
+      STDERR.puts ("┌────────┐") unless ALIAS_HIDE_REMINDER
 
-      STDERR.print("│ alias: └")
-      STDERR.print("─" * (longest_line - 6))
-      STDERR.print("─┐")
-      STDERR.puts
+      STDERR.print("│ alias: └") unless ALIAS_HIDE_REMINDER
+      STDERR.print("─" * (longest_line - 6)) unless ALIAS_HIDE_REMINDER
+      STDERR.print("─┐") unless ALIAS_HIDE_REMINDER
+      STDERR.puts unless ALIAS_HIDE_REMINDER
 
       @call.lines[0].tap do |call_line|
-        STDERR.print("│ $ ")
-        STDERR.print(call_line)
-        STDERR.print(" " * (longest_line - call_line.size))
-        STDERR.print(" │")
-        STDERR.puts
+        STDERR.print("│ $ ") unless ALIAS_HIDE_REMINDER
+        STDERR.print(call_line) unless ALIAS_HIDE_REMINDER
+        STDERR.print(" " * (longest_line - call_line.size)) unless ALIAS_HIDE_REMINDER
+        STDERR.print(" │") unless ALIAS_HIDE_REMINDER
+        STDERR.puts unless ALIAS_HIDE_REMINDER
       end
 
       @call.lines[1..-1].each do |call_line|
-        STDERR.print("│   ")
-        STDERR.print(call_line)
-        STDERR.print(" " * (longest_line - call_line.size))
-        STDERR.print(" │")
-        STDERR.puts
+        STDERR.print("│   ") unless ALIAS_HIDE_REMINDER
+        STDERR.print(call_line) unless ALIAS_HIDE_REMINDER
+        STDERR.print(" " * (longest_line - call_line.size)) unless ALIAS_HIDE_REMINDER
+        STDERR.print(" │") unless ALIAS_HIDE_REMINDER
+        STDERR.puts unless ALIAS_HIDE_REMINDER
       end
 
-      STDERR.print("└─")
-      STDERR.print("─" * (longest_line + 2))
-      STDERR.print("─┘")
-      STDERR.puts
-      STDERR.puts
+      STDERR.print("└─") unless ALIAS_HIDE_REMINDER
+      STDERR.print("─" * (longest_line + 2)) unless ALIAS_HIDE_REMINDER
+      STDERR.print("─┘") unless ALIAS_HIDE_REMINDER
+      STDERR.puts unless ALIAS_HIDE_REMINDER
+      STDERR.puts unless ALIAS_HIDE_REMINDER
 
       full_call = ([@call] + ARGV).join(" ")
       bash_args = ["-c", full_call]
@@ -124,7 +134,7 @@ if PROGRAM_NAME == "aka" || PROGRAM_NAME == "bin/aka"
     aliases.each do |a|
       Process.executable_path.try do |path|
         begin
-        FileUtils.ln_s(path, File.expand_path("~/.config/aka/#{a.invocation}"))
+          FileUtils.ln_s(path, File.expand_path("~/.config/aka/#{a.invocation}"))
         rescue e
           issues += 1
         end
@@ -137,7 +147,7 @@ if PROGRAM_NAME == "aka" || PROGRAM_NAME == "bin/aka"
     aliases.success!
   end
 
-  input = ARGV[0]?.tap( &.try { ARGV.replace(ARGV[1..-1]) })
+  input = ARGV[0]?.tap(&.try { ARGV.replace(ARGV[1..-1]) })
 else
   input = File.basename(PROGRAM_NAME)
 end
